@@ -11,10 +11,12 @@ public class GamePanel extends JPanel implements Runnable {
 
 	// SCREEN settings
 	final int originalTileSize = 16; // 16x16 tile
-	final int scale = 3;
 
+	final int scale = 3;
+	// 16x16pxだと画面に対して小さなピクセルになる為3倍の48x48にスケールさせる
 	final int tileSize = originalTileSize * scale;
 
+	// 画面サイズの設定
 	final int maxScreenCol = 16;
 	final int maxScreenRow = 12;
 	final int screenWidth = tileSize * maxScreenCol; // 768pixels
@@ -24,10 +26,14 @@ public class GamePanel extends JPanel implements Runnable {
 	int playerY = 100;
 	int playerSpeed = 4;
 
-	int FPS = 60;
+	final int FPS = 60;
+
+	// ナノ秒の単位で1秒を表している
+	final int nanoSecond = 1000000000; // 1 second
 
 	KeyHandler keyH = new KeyHandler();
 
+	// ゲームに時間の概念を作り出す為にThreadとwhileループを使用する
 	Thread gameThread;
 
 	public GamePanel() {
@@ -41,7 +47,10 @@ public class GamePanel extends JPanel implements Runnable {
 
 	public void startGameTherea() {
 
+		// thisでGamePanelクラスを渡している
 		gameThread = new Thread(this);
+
+		// runメソッドが呼ばれる
 		gameThread.start();
 
 	}
@@ -49,38 +58,38 @@ public class GamePanel extends JPanel implements Runnable {
 	@Override
 	public void run() {
 
-		double drawInterval = 1000000000 / FPS; // 0.01666 seconds
+		// 0.01666秒ごとに描画している
+		double drawInterval = nanoSecond / FPS; // 0.01666 seconds
+		// deltaは差分という意味
 		double delta = 0;
+		// 経過した時間
+		double deltaTime;
 
 		long lastTime = System.nanoTime();
-		long currentTime = System.nanoTime();
-
-		long currentTimee;
-		long timer = 0;
-		int drawCount = 0;
+		long currentTime;
 
 		while (gameThread != null) {
 
 			currentTime = System.nanoTime();
 
-			delta += (currentTime - lastTime) / drawInterval;
-			timer += (currentTime - lastTime);
+			// 経過した時間を算出
+			deltaTime = currentTime - lastTime;
+
+			delta = delta + deltaTime / drawInterval;
+
 			lastTime = currentTime;
 
 			if (delta >= 1) {
 				update();
-				repaint();
-				delta--;
-				drawCount++;
-			}
 
-			if (timer >= 1000000000) {
-				System.out.println("FPS:" + drawCount);
-				timer = 0;
+				// paintComponentを呼び出す
+				repaint();
+
+				// 値をリセット
+				delta = 0;
 			}
 
 		}
-
 	}
 
 	public void update() {
@@ -93,7 +102,6 @@ public class GamePanel extends JPanel implements Runnable {
 		} else if (keyH.rightPressed) {
 			playerX = playerX + playerSpeed;
 		}
-
 	}
 
 	public void paintComponent(Graphics g) {
