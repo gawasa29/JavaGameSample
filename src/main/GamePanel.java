@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 import entity.Player;
+import tile.TileManeger;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -19,20 +20,17 @@ public class GamePanel extends JPanel implements Runnable {
 	public final int tileSize = originalTileSize * scale;
 
 	// 画面サイズの設定
-	final int maxScreenCol = 16;
-	final int maxScreenRow = 12;
-	final int screenWidth = tileSize * maxScreenCol; // 768pixels
-	final int screenHeight = tileSize * maxScreenRow; // 576 pixels
-
-	int playerX = 100;
-	int playerY = 100;
-	int playerSpeed = 4;
+	public final int maxScreenCol = 16;
+	public final int maxScreenRow = 12;
+	public final int screenWidth = tileSize * maxScreenCol; // 768pixels
+	public final int screenHeight = tileSize * maxScreenRow; // 576 pixels
 
 	final int FPS = 60;
 
 	// ナノ秒の単位で1秒を表している
 	final int nanoSecond = 1000000000; // 1 second
 
+	TileManeger tileM = new TileManeger(this);
 	KeyHandler keyH = new KeyHandler();
 
 	// ゲームに時間の概念を作り出す為にThreadとwhileループを使用する
@@ -103,8 +101,13 @@ public class GamePanel extends JPanel implements Runnable {
 	public void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
+
 		Graphics2D g2 = (Graphics2D) g;
+
+		tileM.draw(g2);
+
 		player.draw(g2);
+
 		g2.dispose();
 	}
 }
